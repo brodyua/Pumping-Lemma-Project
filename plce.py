@@ -56,30 +56,30 @@ grammars = {
                                   Op -> +
                                   Op -> -
                                   Op -> *
-                                  Op -> /"""),
+                                  Op -> /"""), 
  "palindromes"   :  CFG.from_text("""S -> $
                                   S -> a
                                   S -> b
                                   S -> a S a
-                                  S -> b S b"""),
+                                  S -> b S b"""),        
  "balanced parentheses"   :  CFG.from_text("""S -> $
                                               S -> ( S )
-                                              S -> S S"""),
+                                              S -> S S"""), 
   "English Grammar"  : CFG.from_text(""" S -> NP VP
-                                         NP -> CN
+                                         NP -> CN 
                                          NP -> CN PP
-                                         VP -> CV
+                                         VP -> CV 
                                          VP -> CV PP
                                          PP -> P CN
                                          CN -> A N
-                                         CV -> V
+                                         CV -> V 
                                          CV -> V NP
-                                         A -> a
+                                         A -> a 
                                          N -> n
                                          V -> v
                                          P -> p
 
-""")
+""")                                             
 }
 
 def test(re_or_cfg, i_re_or_cfg, s):
@@ -222,7 +222,7 @@ while(p_running):
   print()
 
   for pattern in patterns:
-      print(pattern)
+    print(pattern)
   for grammar in grammars:
     print(grammar)
 
@@ -261,19 +261,29 @@ while(p_running):
 
   # enumerate mode walks the language shortest-first, starting at length p
   if pattern_or_grammar and sampling_mode == "enumerate":
-    string_source = enumerate_by_length(rules, pumping_length, pumping_length + 10, start=start_symbol)
+    string_source = enumerate_by_length(rules, pumping_length, pumping_length + 30, start=start_symbol)
 
+  tested_strings = set()
   for i in range(num_str_to_test):
     if not pattern_or_grammar:
-      sys.modules["rstr.xeger"].STAR_PLUS_LIMIT = pumping_length + 10
-      test_string = xeger_capped(pattern, pumping_length, pumping_length + 10)
+      sys.modules["rstr.xeger"].STAR_PLUS_LIMIT = pumping_length + 30
+      attempts = 0
+      while attempts < 100:
+        test_string = xeger_capped(pattern, pumping_length, pumping_length + 30)
+        attempts += 1
+        if test_string not in tested_strings:
+          tested_strings.add(test_string)
+          break
+      else:
+        print("Maximum attempts reached. No unique string found.")
+        break
     elif sampling_mode == "enumerate":
       test_string = next(string_source, None)
     else:
-      test_string = random_string_simple(rules, pumping_length, pumping_length + 10, start=start_symbol)
+      test_string = random_string_simple(rules, pumping_length, pumping_length + 30, start=start_symbol)
 
     if test_string is None:
-      print("No more strings found with length between", pumping_length, "and", pumping_length + 10)
+      print("No more strings found with length between", pumping_length, "and", pumping_length + 30)
       break
 
     print("test string", test_string)
@@ -292,5 +302,7 @@ while(p_running):
   print("Strings tested: ", passed_strings + failed_strings)
   print("Strings passed: ", passed_strings)
   print("Strings failed: ", failed_strings)
-  print("Counterexamples:", failed_strings_lst)
+  print("Counterexamples:")
+  for failed_string in failed_strings_lst:
+    print("\t", failed_string)
   p_running = False if input("Continue? ") == "No" else True
