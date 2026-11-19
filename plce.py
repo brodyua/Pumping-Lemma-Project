@@ -15,78 +15,76 @@ def xeger_capped(pattern, min_len, max_len, tries=10000):
   return None
 
 patterns = {
-    # basics
-    "any binary string":             r"[01]*",
-    "nonempty":                      r"[01]+",
-    "starts with 0":                 r"0[01]*",
-    "ends with 1":                   r"[01]*1",
-    "starts and ends with same":     r"0([01]*0)?|1([01]*1)?",
+  # basics
+  "any binary string":             r"[01]*",
+  "nonempty":                      r"[01]+",
+  "starts with 0":                 r"0[01]*",
+  "ends with 1":                   r"[01]*1",
+  "starts and ends with same":     r"0([01]*0)?|1([01]*1)?",
 
-    # substrings
-    "contains 101":                  r"[01]*101[01]*",
-    "does not contain 11":           r"(0|10)*1?",
-    "every 1 followed by a 0":       r"(0|10)*",
-    "all 0s then all 1s":            r"0*1*",
-    "alternating 0s and 1s":         r"1?(01)*0?",
+  # substrings
+  "contains 101":                  r"[01]*101[01]*",
+  "does not contain 11":           r"(0|10)*1?",
+  "every 1 followed by a 0":       r"(0|10)*",
+  "all 0s then all 1s":            r"0*1*",
+  "alternating 0s and 1s":         r"1?(01)*0?",
 
-    # counting
-    "exactly two 1s":                r"0*10*10*",
-    "at least two 1s":               r"[01]*1[01]*1[01]*",
-    "at most one 1":                 r"0*1?0*",
-    "even number of 0s":             r"1*(01*01*)*",
-    "even number of 1s":             r"0*(10*10*)*",
+  # counting
+  "exactly two 1s":                r"0*10*10*",
+  "at least two 1s":               r"[01]*1[01]*1[01]*",
+  "at most one 1":                 r"0*1?0*",
+  "even number of 0s":             r"1*(01*01*)*",
+  "even number of 1s":             r"0*(10*10*)*",
 
-    # length / position
-    "even length":                   r"([01]{2})*",
-    "length divisible by 3":         r"([01]{3})*",
-    "third symbol from end is 1":    r"[01]*1[01]{2}",
+  # length / position
+  "even length":                   r"([01]{2})*",
+  "length divisible by 3":         r"([01]{3})*",
+  "third symbol from end is 1":    r"[01]*1[01]{2}",
 
-    # arithmetic
-    "binary number divisible by 3":  r"(0|1(01*0)*1)*",
-    "test1" : r"((ab|ba)*c(a|bb)*d?|(aab|bba)+c*)((abc|bca)?(a|bb|aba)*d)+"
+  # arithmetic
+  "binary number divisible by 3":  r"(0|1(01*0)*1)*",
 }
 
 grammars = {
-  "n 0's followed by n 1's" : CFG.from_text("""S -> 0 S 1
+  "n 0's followed by n 1's":  CFG.from_text("""S -> 0 S 1
                                                S -> $"""),
-  "arithmetic" : CFG.from_text("""S -> 0
-                                  S -> 1
-                                  S -> S Op S
-                                  S -> ( S )
-                                  Op -> +
-                                  Op -> -
-                                  Op -> *
-                                  Op -> /"""), 
- "palindromes"   :  CFG.from_text("""S -> $
-                                  S -> a
-                                  S -> b
-                                  S -> a S a
-                                  S -> b S b"""),        
- "balanced parentheses"   :  CFG.from_text("""S -> $
-                                              S -> ( S )
-                                              S -> S S"""), 
-  "English Grammar"  : CFG.from_text(""" S -> NP VP
-                                         NP -> CN 
-                                         NP -> CN PP
-                                         VP -> CV 
-                                         VP -> CV PP
-                                         PP -> P CN
-                                         CN -> A N
-                                         CV -> V 
-                                         CV -> V NP
-                                         A -> a 
-                                         N -> n
-                                         V -> v
-                                         P -> p
-
-""")                                             
+  "arithmetic":               CFG.from_text("""S -> 0
+                                               S -> 1
+                                               S -> S Op S
+                                               S -> ( S )
+                                               Op -> +
+                                               Op -> -
+                                               Op -> *
+                                               Op -> /"""), 
+ "palindromes":               CFG.from_text("""S -> $
+                                               S -> a
+                                               S -> b
+                                               S -> a S a
+                                               S -> b S b"""),        
+ "balanced parentheses":      CFG.from_text("""S -> $
+                                               S -> ( S )
+                                               S -> S S"""), 
+  # a is an article, n is a noun, v is a verb, p is a preposition
+  "English Grammar":          CFG.from_text(""" S -> NP VP
+                                                NP -> CN 
+                                                NP -> CN PP
+                                                VP -> CV 
+                                                VP -> CV PP
+                                                PP -> P CN
+                                                CN -> A N
+                                                CV -> V 
+                                                CV -> V NP
+                                                A -> a 
+                                                N -> n
+                                                V -> v
+                                                P -> p""")                                             
 }
 
 def test(re_or_cfg, i_re_or_cfg, s):
-    if (not i_re_or_cfg):
-        return re.fullmatch(re_or_cfg, s) is not None
-    else:
-      return re_or_cfg.contains(s)
+  if (not i_re_or_cfg):
+    return re.fullmatch(re_or_cfg, s) is not None
+  else:
+    return re_or_cfg.contains(s)
 
 def pumping_splits(s, p):
   for xy_len in range(1, p + 1):
